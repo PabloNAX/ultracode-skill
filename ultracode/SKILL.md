@@ -16,6 +16,7 @@ This is a skill, not a runtime. It works by giving the current coding agent a di
 - Use task-specific tools exposed by the current host when the task needs them.
 - Create and update workflow artifacts directly as Markdown and JSON files.
 - Use native subagents when the current host exposes them, the task benefits from parallel work, and the user's request or host policy permits delegation.
+- Do not commit, push, publish, or deploy unless the user explicitly asks for that action.
 - Treat an explicit `ultracode`, `$ultracode`, or "ultra code" request as permission to choose delegated mode when the host allows that interpretation.
 - In Codex, prefer real `spawn_agent` for useful independent packets when the request clearly invokes Ultracode or otherwise asks for subagents, delegation, parallel agents, a swarm, or equivalent agent work.
 - In hosts with a different dynamic-workflow policy, follow that host's policy.
