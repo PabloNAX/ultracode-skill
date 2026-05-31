@@ -1,0 +1,7 @@
+interface:
+  display_name: "Ultracode"
+  short_description: "Dynamic workflows for Codex"
+  default_prompt: "Use $ultracode to build this coding task end to end."
+
+policy:
+  allow_implicit_invocation: false
