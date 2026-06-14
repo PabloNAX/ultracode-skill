@@ -83,14 +83,33 @@ Ultracode: implement the settings export feature end to end.
 
 Mode: direct, workflow, or delegated depending on task size, independent packet value, native tools, and host policy.
 
-Reason: `ultracode` requests the structured workflow and authorizes the agent to choose the workflow depth. If native agents are useful and host policy permits it, delegated mode is appropriate.
+Reason: `ultracode` requests the structured workflow and authorizes the agent to choose the workflow depth. For non-trivial work, if native agents are useful and host policy permits it, delegated mode is the default.
 
 Expected behavior:
 
 - Create workflow artifacts if the work is non-trivial.
 - Split discovery, implementation, and verification into packets when useful.
 - Use native delegated agents when the work has independent packets and the host permits delegation.
-- Fall back to workflow mode if native delegation is unavailable or blocked by host policy.
+- Fall back to workflow mode only when native delegation is unavailable, blocked by host policy, not useful, or restricted by the user.
+- Record the concrete no-delegation reason in `plan.md` and `orchestration.md`.
+
+## Whole-repo audit with explicit ultracode
+
+User:
+
+```text
+Use $ultracode to audit this repository.
+```
+
+Mode: delegated, if host-native agent tools are available and policy permits.
+
+Expected behavior:
+
+- Create workflow artifacts using the run root rule.
+- Prefer 2-4 read-only explorer agents for independent audit tracks unless the repo is tiny.
+- Keep integration, prioritization, and final claims in the parent session.
+- Do not exceed 5 total agents without explicit approval.
+- If no agents are used, give a concrete reason such as unavailable tools, tiny scope, or no independent packet value.
 
 ## Risky migration
 
@@ -113,6 +132,7 @@ Expected behavior:
 - Plan and inspect first.
 - Ask before broad rewrites.
 - Continue with read-only mapping if approval is not granted.
+- Use an inline or full eval contract when shared APIs, schemas, auth, or data contracts are touched.
 
 ## No subagent runner
 
@@ -130,3 +150,4 @@ Expected behavior:
 - Create packet files.
 - Execute isolated passes in the parent session.
 - Keep evidence separate by result file.
+- Record the no-delegation reason.

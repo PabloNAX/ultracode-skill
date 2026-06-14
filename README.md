@@ -6,7 +6,7 @@
 [![Antigravity](https://img.shields.io/badge/Antigravity-compatible-4285F4)](https://antigravity.google/docs/skills)
 [![GitHub stars](https://img.shields.io/github/stars/PabloNAX/ultracode-skill?style=social)](https://github.com/PabloNAX/ultracode-skill/stargazers)
 
-Ultracode Skill gives Codex a dynamic workflow layer for serious coding tasks.
+Ultracode Skill gives Codex a dynamic workflow layer for serious coding tasks: planning, native agents, integration, and final verification without turning the repo into a separate runner.
 
 <img src="assets/ultracode-preview.jpg" alt="Ultracode running in Codex" width="100%">
 
@@ -23,7 +23,8 @@ Ultracode asks the agent to:
 3. Create workflow artifacts for non-trivial work.
 4. Use native agents when they are useful and allowed by the host.
 5. Keep integration in the parent session.
-6. Verify the result before answering.
+6. Use lightweight eval contracts for risky shared surfaces.
+7. Verify the result before answering, with a final audit for high-risk runs.
 
 For Codex, that means the skill can use native `spawn_agent` for independent packets, then integrate the results in the parent session.
 
@@ -73,6 +74,8 @@ Use $ultracode to build this feature end to end.
 
 You do not have to manually design the workflow or ask for subagents. Ultracode decides whether the task needs a direct edit, a workflow, or native agents.
 
+For non-trivial Codex tasks, `$ultracode` is delegated-workflow intent: when useful native agents are available, Ultracode should prefer a small bounded fan-out instead of doing every independent packet in one session.
+
 If you want to force a delegated run, you can still say it directly:
 
 ```text
@@ -102,6 +105,8 @@ For non-trivial tasks, Ultracode writes plain Markdown and JSON:
   final-report.md
 ```
 
+High-risk or cross-surface runs may also include `eval-contract.md`, `contracts/`, `handoffs/`, or `final-audit.md`.
+
 These files make the run inspectable. You can see what was delegated, what changed, what passed, and what risk remains.
 
 ## Codex behavior
@@ -113,11 +118,13 @@ The parent session should:
 - keep the critical path local
 - spawn `explorer` agents for read-only discovery
 - spawn `worker` agents only with clear file ownership
+- prefer 2-4 sidecar agents for useful independent packets
+- stay under 5 total sidecar agents unless the user approves more
 - avoid combining `agent_type` with a full-history fork
 - wait only when a result blocks the next parent step
 - close agents after collecting their results
 
-If native agents are unavailable or blocked by policy, Ultracode falls back to workflow mode and says so.
+If native agents are unavailable, blocked by policy, or not useful for the task, Ultracode falls back to workflow mode and records the concrete reason.
 
 ## Live test
 

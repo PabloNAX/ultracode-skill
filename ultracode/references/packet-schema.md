@@ -17,6 +17,15 @@ Use this reference when creating or validating workflow artifacts.
   final-report.md
 ```
 
+Optional high-risk files:
+
+```text
+  eval-contract.md
+  contracts/
+  handoffs/
+  final-audit.md
+```
+
 ## plan.md
 
 `<run-root>` should be `.workflow/ultracode/` unless project instructions name another scratch directory.
@@ -34,10 +43,13 @@ Required sections:
 ## Approval gates
 ## Mode
 ## Work packets
+## Eval contract
 ## Integration policy
 ## Verification plan
 ## Completion criteria
 ```
+
+For explicit Ultracode on a non-trivial workflow run without native agents, include the concrete no-delegation reason.
 
 ## orchestration.md
 
@@ -50,6 +62,7 @@ Required sections:
 ## Packets
 ## Delegation
 ## Agents
+## Delegation limits
 ## Wait points
 ## Fallback
 ## Verification order
@@ -69,6 +82,13 @@ Required keys:
   "updated_at": "ISO-8601 string",
   "status": "planning",
   "mode": "direct|workflow|delegated",
+  "baseline_ref": "git HEAD sha or no-git",
+  "risk_level": "low|medium|high|unknown",
+  "eval_contract": {
+    "level": "none|inline|full",
+    "path": "eval-contract.md or null",
+    "status": "pending|ready|checked"
+  },
   "approval": {
     "required": false,
     "granted": null,
@@ -76,7 +96,11 @@ Required keys:
   },
   "delegation": {
     "native_agent_available": false,
+    "native_agent_planned": false,
     "native_agent_used": false,
+    "agent_count": 0,
+    "wave_count": 0,
+    "no_delegation_reason": "",
     "notes": ""
   },
   "packets": [
@@ -158,11 +182,25 @@ You are not alone in the codebase. Do not revert edits made by others. Adapt to 
 
 ## Summary
 ## Evidence
+## Handoff
 ## Files changed
 ## Decisions
 ## Risks
 ## Verification run
 ## Open questions
+```
+
+Handoff block for shared behavior:
+
+```text
+Handoff:
+- Summary:
+- Changed surfaces:
+- Contracts satisfied:
+- Assumptions:
+- Local checks:
+- Integration evidence:
+- Risks:
 ```
 
 ## integration.md
@@ -187,6 +225,7 @@ You are not alone in the codebase. Do not revert edits made by others. Adapt to 
 ## Outcome
 ## What changed
 ## Verification
+## Final audit
 ## Skipped checks
 ## Remaining risks
 ## Next useful step
@@ -199,3 +238,5 @@ You are not alone in the codebase. Do not revert edits made by others. Adapt to 
 - Keep slugs under 64 characters.
 - Match packet result names to packet IDs.
 - Do not mark work complete without evidence in `verification.checks` or `final-report.md`.
+- Keep native agent fan-out under 5 total without explicit approval.
+- For explicit Ultracode on non-trivial work, `native_agent_used: false` needs a concrete `no_delegation_reason`.

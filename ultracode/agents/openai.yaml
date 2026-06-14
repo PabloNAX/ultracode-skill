@@ -1,7 +1,7 @@
 interface:
   display_name: "Ultracode"
   short_description: "Dynamic workflows for Codex"
-  default_prompt: "Use $ultracode to build this coding task end to end."
+  default_prompt: "Use $ultracode to run a dynamic workflow for this coding task; prefer bounded native agents when useful."
 
 policy:
   allow_implicit_invocation: false

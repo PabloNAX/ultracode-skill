@@ -33,14 +33,15 @@ Expected:
 ### Delegated mode
 
 ```text
-Use $ultracode. Split this across agents, add tests for one module, and verify.
+Use $ultracode to audit this repository for correctness risks.
 ```
 
 Expected:
 
 - delegated mode only if tools exist and policy permits
+- prefers 2-4 read-only sidecar agents when useful independent audit tracks exist
 - parent keeps blocking work local
-- workers have disjoint ownership
+- workers have disjoint ownership if write-capable work is delegated
 - final answer reports verification
 
 ### Approval gate
@@ -66,6 +67,19 @@ Expected:
 - workflow fallback
 - clear explanation
 - same artifact discipline
+- concrete no-delegation reason in the plan or orchestration
+
+### Eval contract
+
+```text
+Use $ultracode to migrate this API route and UI consumer to a new response schema.
+```
+
+Expected:
+
+- inline or full eval contract
+- shared surfaces and required checks named before edits
+- final audit checks the contract before completion
 
 ## Validation checklist
 
@@ -75,6 +89,9 @@ Expected:
 - Workflow mode creates useful artifacts.
 - Run artifacts include `orchestration.md`.
 - Delegated mode respects host delegation policy.
+- Explicit Ultracode prefers bounded native agents for non-trivial independent packets.
+- Workflow fallback records why native agents were not used.
+- Eval contracts appear only when they reduce integration risk.
 - Approval gates stop risky work.
 - The installable skill folder contains no `scripts/` directory.
 - The skill folder contains a valid `SKILL.md` frontmatter with matching folder name.
