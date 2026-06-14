@@ -19,6 +19,8 @@ This is a skill, not a runtime. It works by giving the current coding agent a di
 - Do not commit, push, publish, or deploy unless the user explicitly asks for that action.
 - Treat an explicit `ultracode`, `$ultracode`, or "ultra code" request as permission to choose delegated mode when the host allows that interpretation.
 - In Codex, prefer real `spawn_agent` for useful independent packets when the request clearly invokes Ultracode or otherwise asks for subagents, delegation, parallel agents, a swarm, or equivalent agent work.
+- For explicit Ultracode on a non-trivial task, delegated mode is the default when native agents exist and any independent sidecar work would help.
+- Choose no native agents only when the task is small, tightly coupled, lacks useful independent packets, needs the next blocking decision locally, native agents are unavailable, or the user restricts delegation.
 - In hosts with a different dynamic-workflow policy, follow that host's policy.
 - If a host policy requires separate delegation wording, do not fight it; use workflow mode and mention that native delegation was not permitted.
 
@@ -98,6 +100,9 @@ Behavior:
 - Create workflow artifacts before delegation.
 - Keep the immediate blocking task in the parent session.
 - Delegate only bounded sidecar work that can run in parallel.
+- Default to 2-4 sidecar agents for useful independent work.
+- Do not exceed 5 sidecar agents total across the run without explicit user approval.
+- Run at most one broad implementation wave and one review or verification wave unless the user approves more.
 - Prefer delegation for read-heavy exploration, tests, triage, and summarization.
 - Use write-heavy agents only when file ownership is disjoint and clear.
 - In Codex, use `explorer` agents for read-only questions and `worker` agents for concrete code changes when available.
@@ -131,7 +136,7 @@ When running inside Codex and delegated mode is selected:
 - Do not delegate the parent critical path or work needed for the next immediate decision.
 - Do not wait immediately after spawning unless the parent session is blocked on that result.
 - If `spawn_agent` is available and the request invokes Ultracode or explicitly mentions agents, parallel work, delegation, a swarm, or splitting across agents, prefer real spawned agents over simulated packet passes whenever host policy permits it.
-- If `spawn_agent` is unavailable or permission is not clear, use workflow mode with packet files and say that native delegation was not available or not permitted.
+- If `spawn_agent` is unavailable, permission is not clear, or no independent packet would benefit from an agent, use workflow mode with packet files and record the concrete no-delegation reason.
 
 ## Workflow artifacts
 
@@ -166,7 +171,37 @@ Run layout:
   final-report.md
 ```
 
+Create optional heavy artifacts only when they reduce risk:
+
+```text
+eval-contract.md    # full contract only
+contracts/          # only when one packet produces a surface another consumes
+handoffs/           # only when separate handoff files reduce integration risk
+final-audit.md      # high-risk or full-contract runs
+```
+
 Read `references/packet-schema.md` when filling packet files, result files, `orchestration.md`, or `state.json`.
+
+## Eval contracts
+
+Before splitting work, choose the smallest contract level:
+
+- `none`: tiny direct task.
+- `inline`: ordinary workflow or delegated task. Put 5-12 lines in `plan.md`.
+- `full`: high-risk, cross-surface, migration, public API/schema/CLI/UI flow/auth/data contract, or write-capable agents sharing integration surfaces.
+
+Inline contract template:
+
+```text
+Eval contract:
+- Outcome:
+- Shared surfaces:
+- Required checks:
+- Blocking conditions:
+- Handoff evidence:
+```
+
+Read `references/eval-contracts.md` before creating a full contract.
 
 ## Plan
 
@@ -180,9 +215,12 @@ Keep `plan.md` concrete. Include:
 - approval gates
 - mode
 - work packets
+- eval contract
 - integration policy
 - verification plan
 - completion criteria
+
+For non-trivial workflow mode after explicit Ultracode, include the concrete reason native agents were not used.
 
 Do not let the plan replace execution.
 
@@ -193,6 +231,7 @@ Keep `orchestration.md` short and operational. Include:
 - parent critical path
 - packet list with owners
 - agents to spawn or invoke, if allowed
+- delegation count, wave count, and fallback reason
 - wait points
 - fallback if delegation is unavailable
 - verification order
@@ -321,6 +360,7 @@ After packet work:
 
 - Read each result.
 - Check claimed file edits.
+- Check changed surfaces against the eval contract when one exists.
 - Resolve disagreements using source files, tests, docs, or primary sources.
 - Reject outputs that lack evidence.
 - Update `integration.md`.
@@ -351,6 +391,15 @@ High risk:
 - manual checklist
 - independent review pass
 
+Final audit rules:
+
+- Re-read `plan.md`, `orchestration.md`, and the full contract when present.
+- Verify declared deliverables exist or changed.
+- Run required checks or mark them as skipped with a reason.
+- Mark checks as `pass`, `fail`, `trust-prior`, or `skipped`.
+- Put final audit evidence in `final-report.md`.
+- Create `final-audit.md` for high-risk or full-contract runs.
+
 Report skipped checks honestly.
 
 ## Final answer
@@ -366,6 +415,7 @@ Keep the final answer shorter than `final-report.md`. Include:
 ## References
 
 - Read `references/packet-schema.md` when creating packet files, result files, `orchestration.md`, or `state.json`.
+- Read `references/eval-contracts.md` before full contracts or cross-surface delegation.
 - Read `references/approval-gates.md` before risky or ambiguous work.
 - Read `references/execution-examples.md` when mode behavior is unclear.
 - Read `references/forward-testing.md` when testing or improving this skill.
